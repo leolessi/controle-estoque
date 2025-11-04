@@ -24,14 +24,14 @@ def adicionar_insumo():
 
 
 def deletar_insumo():
-    if len(nome_insumo.get()) < 2:
+    if len(nome_insumo.get()) < 2 or len(lote_insumo.get()) < 1:
         caixa_texto.delete("1.0", END)
         caixa_texto.insert("1.0", f"Nome do insumo invalido ({nome_insumo.get()})")
         return
 
     cursor.execute(
         f"""
-        DELETE FROM Estoque WHERE Produto='{nome_insumo.get()}'
+        DELETE FROM Estoque WHERE Produto='{nome_insumo.get()}' and Lote={lote_insumo.get()}
         """
     )
     cursor.commit()
@@ -42,7 +42,24 @@ def deletar_insumo():
 
 
 def consumir_insumo():
-    print("consumir_insumo")
+    if len(nome_insumo.get()) < 2 or len(lote_insumo.get()) < 1:
+        caixa_texto.delete("1.0", END)
+        caixa_texto.insert("1.0", f"Nome/Lote de produto inválido. Tente novamente.")
+        return
+
+    cursor.execute(
+        f"""
+        UPDATE Estoque
+        SET Quantidade=Quantidade-{qtde_insumo.get()}
+        WHERE Produto="{nome_insumo.get()}" and Lote={lote_insumo.get()}
+        """
+    )
+    cursor.commit()
+
+    # deletar tudo da caixa de texto
+    caixa_texto.delete("1.0", END)
+    # escrever na caixa de texto
+    caixa_texto.insert("1.0", f"{nome_insumo.get()} consumido com sucesso.")
 
 
 def visualizar_insumo():
